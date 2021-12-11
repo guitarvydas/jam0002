@@ -5,10 +5,10 @@
     /* | "$newListCellComponent" Param  -- newListCellComponent */
     /* | "$append" TwoParams  -- append */
 extern List* listNewCellComponent (Component*);
-extern List* append (List*, List*);
+extern List* listAppend (List*, List*);
 
     /* // mechanism Component */
-    /* | "$newComponent" TwoParams -- newComponent */
+    /* | "$newComponent" ThreeParams -- newComponent */
     /* | "$isReady" Param -- isReady */
     /* | "$popInput" Param -- popInput */
     /* | "$callReaction" TwoParams    -- callReaction */
@@ -16,11 +16,12 @@ extern List* append (List*, List*);
     /* | "$hasOutputs" Param        -- hasOutputs */
     /* | "$enqueueMessage" TwoParams  -- enqueueMessage */
     /* | "$enqueueOutput" TwoParams  -- enqueueOutput */
-extern Component* componentNew (InitializationFunction, ReactionFunction);
+extern Component* componentNew (InitializationFunction, ReactionFunction, char*);
 extern void componentCallReaction (Component*, Message);
 extern void componentAppendInput (Component*, Message);
 extern void componentAppendOutput (Component*, Message);
 extern List* componentPopInput (Component*);
+extern void componentGCoutputs (Component*);
 
     /* // Component List iterator */
     /* | "$beginWalkingComponentList" Param -- beginWalkingComponentList */
@@ -53,6 +54,8 @@ extern void kernelSendc (Component*, char);
 extern void kernelPanic (char*);
 extern void kernelStart ();
 extern void kernelStop ();
+extern void kernelKickStart (Component* component, char);
+extern int kernelAnyComponentHasInputs ();
 
 // Counter
 /* $initializeCounter */

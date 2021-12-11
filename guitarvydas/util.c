@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "mpos.h"
 
+int systemRunning;
+
 List* allocCell ();
 void freeCell (List*);
 
@@ -40,18 +42,44 @@ List* listNewCellConnection (Connection* pconnection) {
   return cell;
 }
 
+List* cons (union u_car head, List* tail) {
+  List* cell = allocCell ();
+  cell->datum = head;
+  cell->next = tail;
+  return cell;
+}
+
+union u_car car (List* l) {
+  return l->datum;
+}
+
+List* cdr (List* l) {
+  return l->next;
+}
+
 extern List* listAppend (List* l1, List* l2) {
   // smarten this up if warranted
   if (l1 == NULL) {
     return l2;
   } else {
-    if (l1->next == NULL) {
-      l1->next = l2;
-      return l1;
-    } else {
-      return listAppend (l1->next, l2);
-    }
+    return cons (car (l1), listAppend (cdr (l1), l2));
   }
+}
+
+void listGC (List* l) {
+  if (l == NULL) {
+    return;
+  } else {
+    List* rest = l->next;
+    freeCell (l);
+    listGC (rest);
+  }
+}
+		       
+List* listAppendAndGC (List* l1, List* l2) {
+  List* result = listAppend (l1, l2);
+  listGC (l1);
+  return result;
 }
 
 List* listReverse (List* l) {
@@ -67,12 +95,13 @@ List* listReverse (List* l) {
 }
 
 // Component
-Component* componentNew (InitializationFunction initfn, ReactionFunction reactfn) {
+Component* componentNew (InitializationFunction initfn, ReactionFunction reactfn, char* name) {
   Component* component = (Component*) malloc (sizeof (Component));
   component->reactFunction = reactfn;
   component->initializeFunction = initfn;
   component->inputQueue = NULL;
   component->outputQueue = NULL;
+  component->name = name;
   return component;
 }
 
@@ -82,14 +111,14 @@ void componentAppendInput (Component* component, Message msg) {
   List* cell = allocCell ();
   cell->datum.message = msg;
   cell->next = NULL;
-  component->inputQueue = listAppend (component->inputQueue, cell);
+  component->inputQueue = listAppendAndGC (component->inputQueue, cell);
 }
 
 void componentAppendOutput (Component* component, Message msg) {
   List* cell = allocCell ();
   cell->datum.message = msg;
   cell->next = NULL;
-  component->outputQueue = listAppend (component->outputQueue, cell);
+  component->outputQueue = listAppendAndGC (component->outputQueue, cell);
 }
 
 List* componentPopInput (Component* component) {
@@ -103,6 +132,19 @@ List* componentPopInput (Component* component) {
     return result;
   }
 }
+
+void componentGCoutputs (Component* component) {
+  // free cells from outputQueue
+  // NULL outputQueue
+  List* lis = component->outputQueue;
+  component->outputQueue = (List*) NULL;
+  while (lis) {
+    List* restLis = lis->next;
+    freeCell (lis);
+    lis = restLis;
+  }
+}
+
 
 void componentCallReaction (Component* component, Message msg) {
   (*component->reactFunction) (component, msg);
@@ -144,14 +186,6 @@ void connectionsConnect (Component* sender, Component* receiver) {
 }
 
 
-// Kernel
-void kernelSendc (Component* component, char c) {
-  List* cell = allocCell ();
-  cell->datum.c = c;
-  cell->next = NULL;
-  component->outputQueue = listAppend (component->outputQueue, cell);
-}
-
 void kernelPanic (char* str) {
   fprintf (stderr, "%s\n", str);
   exit (1);
@@ -160,4 +194,5 @@ void kernelPanic (char* str) {
 int systemRunning = 1;
 void kernelStart () { systemRunning = 1; }
 void kernelStop () { systemRunning = 0; }
+
 

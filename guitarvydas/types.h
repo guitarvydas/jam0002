@@ -11,14 +11,16 @@ union u_Message {
   struct s_Connection* pconnection;
 };
 
-struct s_List {
-  union {
+union u_car {
     char c;
     int i;
     struct s_Component* pcomponent;
     struct s_Connection* pconnection;
     union u_Message message;
-  } datum;
+};
+
+struct s_List {
+  union u_car datum;
   struct s_List* next;
 };
 
@@ -27,6 +29,7 @@ struct s_Component {
   struct s_List* inputQueue;
   struct s_List* outputQueue;
   void (*initializeFunction) (struct s_Component* self);
+  char* name; // for debug
 };
 
 struct s_Sender {

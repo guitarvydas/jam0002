@@ -16,37 +16,21 @@ void DistributeMaybe (Component*);
 void DistributeOutputsFrom (Component*);
 
 void Dispatcher () {
-  while (kernelAnyComponentHasInputs ()) {
+  while (systemRunning) {
     Dispatch ();
     DistributeOutputsToReceivers ();
   }
-  printf ("Dispatcher done\n");
 }
 
 void Dispatch () {
-  /* go through list of components and dispatch (once) any component that has input(s) */
   List* componentList;
 componentList = runQueue;
   while ((componentList != NULL)) {
       Component* c = componentList->datum.pcomponent;
       DispatchMaybe (c);
 componentList = (componentList != NULL) ? componentList->next : (List*)NULL;
-  }
+    }
 ;
-}
-
-int kernelAnyComponentHasInputs () {
-  List* componentList;
-componentList = runQueue;
-  while ((componentList != NULL)) {
-      Component* c = componentList->datum.pcomponent;
-      if (c->inputQueue) {
-	return 1;
-      }
-componentList = (componentList != NULL) ? componentList->next : (List*)NULL;
-  }
-;
-  return 0;
 }
 
 void DispatchMaybe (Component* c) {
@@ -81,7 +65,6 @@ void DistributeMaybe (Component* c) {
 void DistributeOutputsFrom (Component* c) {
   List* outputs;
 outputs = componentGetOutputsAsSent (c);
-componentGCoutputs (c);
   while ((outputs != NULL)) {
     Message m = outputs->datum.message;
     DeliverMessageToReceiver (c, m);
@@ -104,13 +87,6 @@ void panic (char* panicMessage) {
 void kernelSendc (Component* self, char c) {
   Message m;
   m.c = c;
-componentAppendOutput (self, m);
+
 }
  
-void kernelKickStart (Component* component, char junk) {
-  Message m;
-  m.c = junk;
-componentAppendInput (component, m);
-}
-  
-

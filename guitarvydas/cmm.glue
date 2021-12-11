@@ -7,10 +7,10 @@ Macro_datumMessage [k Param] = [[${support.getParam1 ()}->datum.message]]
 Macro_datumpComponent [k Param] = [[${support.getParam1 ()}->datum.pcomponent]]
 Macro_datumpConnection [k Param] = [[${support.getParam1 ()}->datum.pconnection]]
 Macro_newListCellComponent [k Param] = [[listNewCellComponent (${support.getParam1 ()})]]
-Macro_append [k TwoParams] = [[append (${support.getParam1 ()}, ${support.getParam2 ()})]]
+Macro_append [k TwoParams] = [[${support.getParam1 ()} = listAppend (${support.getParam1 ()}, ${support.getParam2 ()})]]
 
 Macro_newComponent [k TwoParams] 
-  = [[ componentNew (${support.getParam1 ()}, ${support.getParam2 ()}) ]]
+  = [[ componentNew (${support.getParam1 ()}, ${support.getParam2 ()}, ${support.getParam3 ()}) ]]
 Macro_hasInputs [k Param] = [[${support.getParam1 ()}->inputQueue]]
 Macro_hasOutputs [k Param] = [[${support.getParam1 ()}->outputQueue]]
 Macro_isReady [k Param] = [[${support.getParam1 ()}->inputQueue]]
@@ -18,6 +18,7 @@ Macro_callReaction [k TwoParams] = [[componentCallReaction (${support.getParam1 
 Macro_enqueueMessage [k TwoParams] = [[componentAppendInput (${support.getParam1 ()}, ${support.getParam2 ()})]]
 Macro_enqueueOutput [k TwoParams] = [[componentAppendOutput (${support.getParam1 ()}, ${support.getParam2 ()})]]
 Macro_popInput [k Param] = [[componentPopInput (${support.getParam1 ()})]]
+Macro_clearOutputs [k Param] = [[componentGCoutputs (${support.getParam1 ()})]]
 
 Macro_beginWalkingComponentList [k Param] = [[${support.getParam1 ()} = runQueue]]
 Macro_endWalkingComponentList [k Params] = [[]]
@@ -39,7 +40,9 @@ Macro_withLock [k Block] = [[\{${Block}\}\n]]
 Macro_sendc [k TwoParams] = [[kernelSendc (${support.getParam1 ()}, ${support.getParam2 ()})]]
 Macro_panic [k Param] = [[kernelPanic (${support.getParam1 ()})]]
 Macro_start [k] = [[kernelStart ()]]
+Macro_kickstart [k TwoParams] = [[kernelKickStart (${support.getParam1 ()}, ${support.getParam2 ()})]]
 Macro_quit [k] = [[kernelStop ()]]
+Macro_anyComponentHasInputs [k] = [[kernelAnyComponentHasInputs ()]]
 
 Macro_initializeCounter [m] = [[counter = 0]]
 Macro_decCounter [m] = [[counter -= 1]]
@@ -47,6 +50,7 @@ Macro_counterIsGreaterThanZero [m] = [[counter > 0]]
 
 Param [klp Expr krp] = [[${support.pushParam1 (Expr)}]]
 TwoParams [klp Expr1 kcomma Expr2 krp] = [[${support.pushParam1 (Expr1)}${support.pushParam2 (Expr2)}]]
+ThreeParams [klp Expr1 kcomma Expr2 kcomma2 Expr3 krp] = [[${support.pushParam1 (Expr1)}${support.pushParam2 (Expr2)}${support.pushParam3 (Expr3)}]]
 
 
 Expr_funccall [expr klp @Arglist krp] = [[${expr}(${Arglist})]]
