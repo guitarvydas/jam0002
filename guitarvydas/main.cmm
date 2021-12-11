@@ -4,13 +4,19 @@
 #include "kernel.h"
 
 int main (int argc, char **argv) {
-  Component* p = $newComponent (initProducer, reactProducer);
-  Component* c = $newComponent (initConsumer, reactConsumer);
+  Component* p = $newComponent (initProducer, reactProducer, "producer");
+  Component* c = $newComponent (initConsumer, reactConsumer, "consumer");
   List* lis1 = $newListCellComponent (p);
   List* lis2 = $newListCellComponent (c);
   $append (lis1, lis2);
   runQueue = lis1;
   $connect (p, c);
+  $kickstart (p, '1');
+  $kickstart (p, '2');
+  $kickstart (p, '3');
+  $kickstart (p, '4');
+  $kickstart (p, '5');
+  $start;
   Dispatcher ();
   return 0;
 }

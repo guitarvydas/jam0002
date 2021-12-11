@@ -3,13 +3,9 @@
 #include "mpos.h"
 #include "kernel.h"
 
-void DispatchTransferOutputs ();
 List* runQueue;
-int systemRunning = 1;
 
-void kernelStart () { systemRunning = 1; }
-void kernelStop () { systemRunning = 0; }
-
+void DispatchTransferOutputs ();
 void Dispatch ();
 void DistributeOutputsToReceivers ();
 void DispatchMaybe (Component*);
@@ -20,21 +16,37 @@ void DistributeMaybe (Component*);
 void DistributeOutputsFrom (Component*);
 
 void Dispatcher () {
-  while (systemRunning) {
+  while ($anyComponentHasInputs) {
     Dispatch ();
     DistributeOutputsToReceivers ();
   }
+  printf ("Dispatcher done\n");
 }
 
 void Dispatch () {
+  /* go through list of components and dispatch (once) any component that has input(s) */
   List* componentList;
   $beginWalkingComponentList (componentList);
   while ($walkMoreComponents (componentList)) {
       Component* c = $nextComponentInList (componentList);
       DispatchMaybe (c);
       $advance (componentList);
-    }
-    $endWalkingComponentList (componentList);
+  }
+  $endWalkingComponentList (componentList);
+}
+
+int kernelAnyComponentHasInputs () {
+  List* componentList;
+  $beginWalkingComponentList (componentList);
+  while ($walkMoreComponents (componentList)) {
+      Component* c = $nextComponentInList (componentList);
+      if ($isReady (c)) {
+	return 1;
+      }
+      $advance (componentList);
+  }
+  $endWalkingComponentList (componentList);
+  return 0;
 }
 
 void DispatchMaybe (Component* c) {
@@ -69,6 +81,7 @@ void DistributeMaybe (Component* c) {
 void DistributeOutputsFrom (Component* c) {
   List* outputs;
   $beginWalkingOutputsAsSent (outputs, c);
+  $clearOutputs (c);
   while ($walkMoreOutputs (outputs)) {
     Message m = $nextOutput (outputs);
     DeliverMessageToReceiver (c, m);
@@ -94,4 +107,9 @@ void kernelSendc (Component* self, char c) {
   $enqueueOutput (self, m);
 }
  
-
+void kernelKickStart (Component* component, char junk) {
+  Message m;
+  m.c = junk;
+  $enqueueMessage (component, m);
+}
+  

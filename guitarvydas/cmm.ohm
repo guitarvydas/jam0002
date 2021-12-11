@@ -14,7 +14,7 @@ cmm {
     | "$append" TwoParams  -- append
 
     // mechanism Component
-    | "$newComponent" TwoParams -- newComponent
+    | "$newComponent" ThreeParams -- newComponent
     | "$isReady" Param -- isReady
     | "$popInput" Param -- popInput
     | "$callReaction" TwoParams    -- callReaction
@@ -22,6 +22,7 @@ cmm {
     | "$hasOutputs" Param        -- hasOutputs
     | "$enqueueMessage" TwoParams  -- enqueueMessage
     | "$enqueueOutput" TwoParams  -- enqueueOutput
+    | "$clearOutputs" Param -- clearOutputs
 
     // Component List iterator
     | "$beginWalkingComponentList" Param -- beginWalkingComponentList
@@ -54,10 +55,13 @@ cmm {
     | "$panic" Param    -- panic
     | "$quit"           -- quit
     | "$start"           -- start
+    | "$kickstart" TwoParams -- kickstart
+    | "$anyComponentHasInputs" -- anyComponentHasInputs
 
 
 Param = "(" Expr ")"
 TwoParams = "(" Expr "," Expr ")"
+ThreeParams = "(" Expr "," Expr "," Expr")"
 Expr
   = "(" Expr ")" Expr -- cast
   | "(" Expr ")" -- nested

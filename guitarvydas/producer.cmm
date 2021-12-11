@@ -5,14 +5,8 @@
 int counter;
 
 void initProducer (Component* self) {
-  $initializeCounter;
 }
 
 void reactProducer (Component* self, Message m) {
-  $decCounter;
-  if ($counterIsGreaterThanZero) {
-      $sendc (self, '*');
-    } else {
-      $quit;
-    }
+  $sendc (self, m.c);
 }
