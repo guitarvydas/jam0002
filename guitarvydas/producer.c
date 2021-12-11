@@ -8,6 +8,6 @@ void initProducer (Component* self) {
 }
 
 void reactProducer (Component* self, Message m) {
-kernelSendc (self, '*');
+kernelSendc (self, m.c);
 }
 

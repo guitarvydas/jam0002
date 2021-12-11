@@ -32,6 +32,12 @@ gcc -c -o main.o main.c
 echo 'gcc -c -o util.o util.c'
 gcc -c -o util.o util.c
 
+echo 'gcc -o main main.o util.o os.o producer.o consumer.o'
+gcc -o main main.o util.o os.o producer.o consumer.o
+chmod a+x main
+echo 'running C code'
+./main
+
 ${d2f} ${lj2} DaisyChain >fb.pl
 echo DaisyChain.drawio '->' fb.pl
 

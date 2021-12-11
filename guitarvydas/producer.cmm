@@ -8,5 +8,5 @@ void initProducer (Component* self) {
 }
 
 void reactProducer (Component* self, Message m) {
-  $sendc (self, '*');
+  $sendc (self, m.c);
 }
